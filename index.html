@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Arc Donation App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<h1>Arc Donation App</h1>
+
+<button id="connect">Connect Wallet</button>
+
+<br><br>
+
+<input type="text" id="message" placeholder="Your message">
+
+<br><br>
+
+<input type="number" id="amount" placeholder="Amount">
+
+<br><br>
+
+<button id="donate">Donate</button>
+
+<p id="status"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js"></script>
+
+<script>
+
+const contractAddress =
+"0x5701F895cAa3D197412b1a0C7B7784Ab6497f9A2";
+
+const abi = [
+{
+"inputs":[
+{
+"internalType":"string",
+"name":"message",
+"type":"string"
+}
+],
+"name":"donate",
+"outputs":[],
+"stateMutability":"payable",
+"type":"function"
+}
+];
+
+let signer;
+let contract;
+
+document.getElementById("connect").onclick =
+async () => {
+
+if (!window.ethereum) {
+alert("Install a wallet");
+return;
+}
+
+const provider =
+new ethers.BrowserProvider(window.ethereum);
+
+await provider.send(
+"eth_requestAccounts",
+[]
+);
+
+signer = await provider.getSigner();
+
+contract = new ethers.Contract(
+contractAddress,
+abi,
+signer
+);
+
+document.getElementById("status").innerText =
+"Wallet Connected";
+};
+
+document.getElementById("donate").onclick =
+async () => {
+
+const message =
+document.getElementById("message").value;
+
+const amount =
+document.getElementById("amount").value;
+
+try {
+
+const tx =
+await contract.donate(
+message,
+{
+value:
+ethers.parseEther(amount)
+}
+);
+
+document.getElementById("status").innerText =
+"Waiting for confirmation...";
+
+await tx.wait();
+
+document.getElementById("status").innerText =
+"Donation Successful!";
+
+} catch(error) {
+
+document.getElementById("status").innerText =
+"Transaction Failed";
+
+}
+
+};
+
+</script>
+
+</body>
+</html>
