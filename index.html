@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -238,11 +237,29 @@ amount
 }
 );
 
+document.getElementById("status")
+.innerHTML =
+`
+Transaction Sent ✅
+<br><br>
+<a href="https://testnet.arcscan.app/tx/${tx.hash}"
+target="_blank">
+View Transaction 🔗
+</a>
+`;
+
 await tx.wait();
 
 document.getElementById("status")
-.innerText =
-"Donation Successful 🎉";
+.innerHTML =
+`
+Donation Successful 🎉
+<br><br>
+<a href="https://testnet.arcscan.app/tx/${tx.hash}"
+target="_blank">
+View Transaction 🔗
+</a>
+`;
 
 document.getElementById("message")
 .value = "";
@@ -265,4 +282,4 @@ console.log(err);
 </script>
 
 </body>
-</html
+</html>
