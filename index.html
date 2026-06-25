@@ -205,6 +205,29 @@ input::placeholder { color: #475569; }
 
 .contract-info span { color: #60a5fa; }
 
+.stats-card {
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.15);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.stats-title {
+  color: #94a3b8;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stats-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #34d399;
+  margin-top: 6px;
+}
+
 .footer {
   margin-top: 22px;
   text-align: center;
@@ -222,6 +245,11 @@ input::placeholder { color: #475569; }
 
   <h1>ArcDonate</h1>
   <p class="subtitle">Send USDC donations on Arc Testnet</p>
+
+  <div class="stats-card">
+    <div class="stats-title">Total Raised</div>
+    <div class="stats-value" id="totalRaised">0 USDC</div>
+  </div>
 
   <button id="connectBtn">🔗 Connect Wallet</button>
 
@@ -250,7 +278,7 @@ input::placeholder { color: #475569; }
   <div class="status" id="status"></div>
 
   <div class="footer">
-    Built by <a href="https://x.com/esmereelumar" target="_blank">@esmereelumar</a>
+    Built by <a href="https://x.com/esmereelumar" target="_blank">@esmereelumar</a> ❤️
   </div>
 
 </div>
@@ -260,7 +288,7 @@ input::placeholder { color: #475569; }
 <script>
 
   // ─── Arc Testnet Config ───────────────────────────────────────────
-  const ARC_CHAIN_ID = "5042002";
+  const ARC_CHAIN_ID = "0x4CF4B2";
   const ARC_RPC      = "https://rpc.testnet.arc.network";
   const ARC_NAME     = "Arc Testnet";
 
@@ -284,6 +312,20 @@ input::placeholder { color: #475569; }
 
   let signer   = null;
   let contract = null;
+  let provider = null;
+
+  // Total Raised: always uses public provider, no wallet needed
+  async function loadTotalRaised() {
+    try {
+      const pub       = new ethers.JsonRpcProvider(ARC_RPC);
+      const balance   = await pub.getBalance(contractAddress);
+      const formatted = parseFloat(ethers.formatEther(balance)).toFixed(4);
+      document.getElementById("totalRaised").textContent = formatted + " USDC";
+    } catch (err) {
+      console.error("Could not fetch total raised:", err);
+    }
+  }
+
 
   // ─── Char counter ─────────────────────────────────────────────────
   document.getElementById("message").addEventListener("input", function () {
@@ -371,7 +413,7 @@ input::placeholder { color: #475569; }
       await window.ethereum.request({ method: "eth_requestAccounts" });
       await switchToArc();
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      provider = new ethers.BrowserProvider(window.ethereum);
       signer   = await provider.getSigner();
       contract = new ethers.Contract(contractAddress, abi, signer);
 
@@ -380,6 +422,7 @@ input::placeholder { color: #475569; }
       setConnectBtn("connected");
       document.getElementById("donateBtn").disabled = false;
       setStatus("✅ Connected to " + ARC_NAME, "success");
+      await loadTotalRaised();
 
     } catch (err) {
       console.error(err);
@@ -434,6 +477,8 @@ input::placeholder { color: #475569; }
         "success"
       );
 
+      await loadTotalRaised();
+
       document.getElementById("message").value = "";
       document.getElementById("amount").value  = "";
       document.getElementById("charCount").textContent = "0 / 120";
@@ -448,6 +493,9 @@ input::placeholder { color: #475569; }
       setInputsDisabled(false);
     }
   };
+
+  // Load total raised on page open — no wallet needed
+  window.addEventListener("load", () => loadTotalRaised());
 
 </script>
 
