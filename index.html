@@ -425,8 +425,9 @@ async function loadBalance() {
       contract = new ethers.Contract(contractAddress, abi, signer);
 
       const address = await signer.getAddress();
-      setWallet(address);
-      setConnectBtn("connected");
+setWallet(address);
+await loadBalance();
+setConnectBtn("connected");
       document.getElementById("donateBtn").disabled = false;
       setStatus("✅ Connected to " + ARC_NAME, "success");
       await loadTotalRaised();
