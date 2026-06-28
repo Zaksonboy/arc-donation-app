@@ -373,7 +373,14 @@ input::placeholder { color: #475569; }
     box.innerHTML = `<span class="wallet-dot connected"></span>Connected: ${short}`;
     box.classList.add("connected");
   }
+async function loadBalance() {
+    const balance = await provider.getBalance(await signer.getAddress());
 
+    document.getElementById("balanceBox").textContent =
+        "Balance: " +
+        parseFloat(ethers.formatEther(balance)).toFixed(4) +
+        " USDC";
+}
   async function switchToArc() {
     try {
       await window.ethereum.request({
